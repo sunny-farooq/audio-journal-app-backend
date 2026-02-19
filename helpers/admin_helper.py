@@ -5,6 +5,7 @@ from typing import Annotated
 from models.admin import Admin
 from dotenv import load_dotenv
 import os
+
 load_dotenv()
 SECRET_KEY =os.getenv("ADMIN_SECRET_KEY")
 ALgortithm =os.getenv("ALgortithm")
