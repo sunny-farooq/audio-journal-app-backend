@@ -1,5 +1,7 @@
 from tortoise import Tortoise, run_async
 import os 
+from dotenv import load_dotenv
+load_dotenv()
 
 async def init():
     await Tortoise.init(
