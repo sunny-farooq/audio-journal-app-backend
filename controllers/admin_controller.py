@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException, Depends
-from fastapi.concurrency import run_in_threadpool
 from models.admin import Admin
 from argon2 import PasswordHasher
 from helpers.admin_helper import create_access_token
@@ -79,19 +78,6 @@ async def get_audio_files_number(admin: Annotated[Admin, Depends(read_current_ad
 
 @admin_router.get("/storage-cost")
 async def get_storage_cost(admin: Annotated[Admin, Depends(read_current_admin)]):
-    # # try:
-    # #     storage = await Audio.all().values("size_of_audio")
-    # #     list_of_storage = []
-    # #     for store in storage:
-
-    # # finally:
-    # #     return total_size
-    # storage = await Audio.all().values("size_of_audio")
-    
-    # for store in storage:
-    #     storage_list=[]
-    #     storage_list = storage_list.append(store["size_of_audio"])
-    # return storage_list
     storage = await Audio.all().values("size_of_audio")
     
     # Method 1: Direct sum (simplest and best)
@@ -108,11 +94,6 @@ async def format_analysis(admin: Annotated[Admin, Depends(read_current_admin)]):
     formats = await Audio.all().values("format_type")
     format_counts = Counter(format["format_type"] for format in formats)
     return {"total_files": len(formats), "format_breakdown": dict(format_counts)}
-
-# @admin_router.get("/average-duration")
-# async def length_analysis(admin: Annotated[Admin, Depends(read_current_admin)]):
-#     durations = await Audio.all().values("duration")
-#     return durations
 
 def duration_to_seconds(duration_str):
     """Convert 'MM:SS' format to total seconds"""

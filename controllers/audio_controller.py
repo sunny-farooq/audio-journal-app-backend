@@ -63,7 +63,6 @@ async def upload_file(user: Annotated[User,Depends(read_current_user)], file: Up
         return uploaded_audio
     except Exception as e:
         raise HTTPException(status=status.HTTP_404_NOT_FOUND)
-    #return {"filename": file_name, "content_type": file.content_type,"file_size":rounded_size, "duration":total_duration}
 
 
 @audio_router.get("/get-audio")

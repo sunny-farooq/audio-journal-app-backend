@@ -31,12 +31,6 @@ user_router = APIRouter(tags=["users"])
 def index():
     return {"status": "user_router is Working Properly"}
 
-# @user_router.post("/signup-user", response_model=schemas.user_response)
-# def user_signup(request: schemas.user_signup):
-#     user = (name='New Tournament')
-#     await tournament.save()
-#     return request
-
 @user_router.post("/signup", response_model=user_response)
 async def user_signup(request: user_signup):
     new_user = await User.create(name=request.name,

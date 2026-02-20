@@ -1,9 +1,7 @@
-from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException, Depends
 from helpers.user_helpers import read_current_user
 from typing import Annotated
 from models.user import User
-from fastapi import UploadFile, File
 import os
 from models.audio import Audio
 from helpers.transcript_helper import transcript_helper

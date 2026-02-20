@@ -1,4 +1,4 @@
-from tortoise import Tortoise, run_async
+from tortoise import Tortoise
 import os 
 from dotenv import load_dotenv
 load_dotenv()

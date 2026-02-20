@@ -8,7 +8,7 @@ class Audio(Model):
     size_of_audio=fields.TextField()
     category=fields.TextField(null=True)
     format_type=fields.TextField()
-    duration=fields.TextField()  # 8:980
+    duration=fields.TextField()
     transcripted=fields.BooleanField(default=False)
     summary_created=fields.BooleanField(default=False)
     transcript=fields.TextField(null=True)

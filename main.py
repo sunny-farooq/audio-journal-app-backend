@@ -5,8 +5,8 @@ from controllers import audio_controller
 from controllers import transcript_summary_controller
 from controllers import admin_controller
 from helpers.tortoise_config import init
-import os
-from models.user import User
+
+
 
 load_dotenv()
 
