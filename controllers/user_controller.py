@@ -54,7 +54,7 @@ async def login(email: str, password:str ):
         token = create_access_token({"user_id": str(user.id), 'email': user.email })
         return {"token": token}
     except argon2.exceptions.VerifyMismatchError as e:
-            raise HTTPException(400, "Password is wronh")
+            raise HTTPException(400, "Password is wrong")
     except Exception as e:
         raise HTTPException(400, str(e))
 @user_router.delete("/delete-user")
@@ -66,6 +66,8 @@ async def delete_user(email:str, user: Annotated[User, Depends(read_current_user
 @user_router.put("/update_user")
 async def update_user(email: str, password:str, user: Annotated[User, Depends(read_current_user)]):
    user = await User.get_or_none(email=email)
+   if not user:
+       raise HTTPException(400, "Wrong Email")
    user.password = password
    await user.save()
    return user

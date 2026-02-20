@@ -56,15 +56,19 @@ async def login(email: str, password:str ):
         token = create_access_token({"user_id": str(user.id), 'email': user.email })
         return {"token": token}
     except argon2.exceptions.VerifyMismatchError as e:
-            raise HTTPException(400, "Error")
+            raise HTTPException(400, "Password or Email is Wrong")
     except Exception as e:
-        raise HTTPException(400, str(e))
+        raise HTTPException(400,"Password or Email is Wrong")
 
 
 @admin_router.get("/get-users")  
 async def get_users(admin: Annotated[Admin, Depends(read_current_admin)]):
+    current_admin= await Admin.get(admin=admin)
+    if not current_admin:
+        raise HTTPException(400, "Fake Admin Request")
     all_users = await User.all().values("id","name","email")
     return all_users
+
 
 
 @admin_router.get("/get-total-audio-files-number")
@@ -78,27 +82,12 @@ async def get_audio_files_number(admin: Annotated[Admin, Depends(read_current_ad
 
 @admin_router.get("/storage-cost")
 async def get_storage_cost(admin: Annotated[Admin, Depends(read_current_admin)]):
-    # # try:
-    # #     storage = await Audio.all().values("size_of_audio")
-    # #     list_of_storage = []
-    # #     for store in storage:
-
-    # # finally:
-    # #     return total_size
-    # storage = await Audio.all().values("size_of_audio")
-    
-    # for store in storage:
-    #     storage_list=[]
-    #     storage_list = storage_list.append(store["size_of_audio"])
-    # return storage_list
     storage = await Audio.all().values("size_of_audio")
-    
-    # Method 1: Direct sum (simplest and best)
     total_size = sum(float(store["size_of_audio"]) for store in storage)
-    rounded_size = round(total_size, 2)
+    rounded_size = round(total_size)
     in_Gb=rounded_size/1024
     cost = in_Gb*0.1
-    round_cost=round(cost,2)
+    round_cost=round(cost, 3)
     return {"total_size_gb": round(in_Gb,2), "cost": round_cost, "cost_currency":"Dollar"}
 
 
@@ -108,10 +97,6 @@ async def format_analysis(admin: Annotated[Admin, Depends(read_current_admin)]):
     format_counts = Counter(format["format_type"] for format in formats)
     return {"total_files": len(formats), "format_breakdown": dict(format_counts)}
 
-# @admin_router.get("/average-duration")
-# async def length_analysis(admin: Annotated[Admin, Depends(read_current_admin)]):
-#     durations = await Audio.all().values("duration")
-#     return durations
 
 def duration_to_seconds(duration_str):
     """Convert 'MM:SS' format to total seconds"""
@@ -131,10 +116,9 @@ async def get_average_duration(admin: Annotated[Admin, Depends(read_current_admi
     if not durations:
         raise HTTPException(404, "No audio files found")
     
-    # Calculate total seconds
+
     total_seconds = sum(duration_to_seconds(d["duration"]) for d in durations)
     
-    # Calculate average
     average_seconds = total_seconds / len(durations)
     average_duration = seconds_to_duration(average_seconds)
     

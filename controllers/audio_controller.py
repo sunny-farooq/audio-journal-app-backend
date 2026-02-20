@@ -70,12 +70,14 @@ async def upload_file(user: Annotated[User,Depends(read_current_user)], file: Up
 async def get_audio(user: Annotated[User,Depends(read_current_user)],audio_id:str):
     try:
         requested_audio=await Audio.get(audio_id=audio_id,user=user).values("audio_path")
+        if not requested_audio:
+            raise HTTPException(status_code=404, detail="Audio file not found.")
         file_path=requested_audio["audio_path"]
         if not os.path.exists(file_path):
             raise HTTPException(status_code=404, detail="Audio file not found.")
         return FileResponse(path=file_path)
     except Exception as e:
-        raise HTTPException(status=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(404, "Not Found")
 
 
 @audio_router.post("/test_audio")
@@ -129,7 +131,7 @@ async def delete_audio(user: Annotated[User,Depends(read_current_user)],audio_id
         await Audio.filter(audio_id=audio_id,user=user).delete()
         return {"status":"Successfully Deleted"}
     except Exception as e:
-        raise HTTPException(status=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(404, "File not Found")
 
 @audio_router.post("/create-category")
 async def create_category(user: Annotated[User,Depends(read_current_user)], category_name:str, audio_id:str):
@@ -161,7 +163,7 @@ async def delete_audio(user: Annotated[User,Depends(read_current_user)],category
         os.remove(audio_path)
         return {"status": "successfully deleted the audio"}
     except Exception as e:
-        raise HTTPException(status=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(404, "File not FOund")
     
 
 
