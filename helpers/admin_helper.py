@@ -12,14 +12,16 @@ ALgortithm =os.getenv("ALgortithm")
 
 security = HTTPBearer()
 
-async def read_current_admin(
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)]
-):
-    payload = decode_token(credentials.credentials)
-    user = await Admin.get_or_none(id=payload.get("user_id", None))
-    if not user:
-        raise HTTPException("admin not found")
-    return user
+async def read_current_admin(credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)]):
+    try:
+        payload = decode_token(credentials.credentials)
+        print("Payload", payload)
+        user = await Admin.get_or_none(id=payload.get("user_id", None))
+        if not user:
+            raise HTTPException("admin not found")
+        return user
+    except jwt.exceptions.InvalidSignatureError as e:
+        raise HTTPException(404, "Admin Not Found")
 
 def create_access_token(payload: dict):
     return jwt.encode(payload, SECRET_KEY, ALgortithm)
@@ -30,6 +32,3 @@ def decode_token(jwt_token: str):
 
 if __name__ == "__main__":  
     token = create_access_token({"user_id": 1})
-    print(token)
-
-    print(decode_token(token))

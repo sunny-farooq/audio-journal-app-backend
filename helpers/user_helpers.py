@@ -15,11 +15,14 @@ security = HTTPBearer()
 async def read_current_user(
     credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)]
 ):
-    payload = decode_token(credentials.credentials)
-    user = await User.get_or_none(id=payload.get("user_id", None))
-    if not user:
-        raise HTTPException("user not found")
-    return user
+    try:
+        payload = decode_token(credentials.credentials)
+        user = await User.get_or_none(id=payload.get("user_id", None))
+        if not user:
+            raise HTTPException("user not found")
+        return user
+    except jwt.exceptions.InvalidSignatureError as e:
+            raise HTTPException(404, "User Not Found")
 
 
 def create_access_token(payload: dict):
