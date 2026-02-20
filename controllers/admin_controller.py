@@ -80,7 +80,6 @@ async def get_audio_files_number(admin: Annotated[Admin, Depends(read_current_ad
 async def get_storage_cost(admin: Annotated[Admin, Depends(read_current_admin)]):
     storage = await Audio.all().values("size_of_audio")
     
-    # Method 1: Direct sum (simplest and best)
     total_size = sum(float(store["size_of_audio"]) for store in storage)
     rounded_size = round(total_size, 2)
     in_Gb=rounded_size/1024
@@ -113,10 +112,8 @@ async def get_average_duration(admin: Annotated[Admin, Depends(read_current_admi
     if not durations:
         raise HTTPException(404, "No audio files found")
     
-    # Calculate total seconds
     total_seconds = sum(duration_to_seconds(d["duration"]) for d in durations)
-    
-    # Calculate average
+
     average_seconds = total_seconds / len(durations)
     average_duration = seconds_to_duration(average_seconds)
     
